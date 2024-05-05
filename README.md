@@ -8,3 +8,9 @@ This user integration component is based on the official core integration (broad
 Therefore, we state that we are not responsible for any problems that arise during use.
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=lunDreame&repository=broadlink&category=Integration)
+
+## Credits
+Use the broadlink package.
+https://github.com/mjg59/python-broadlink
+
+https://github.com/home-assistant/core/tree/dev/homeassistant/components/broadlink
