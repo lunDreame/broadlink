@@ -39,7 +39,7 @@ DOMAINS_AND_TYPES = {
 }
 DEVICE_TYPES = set.union(*DOMAINS_AND_TYPES.values())
 
-CONF_SETUP = "setup"
+CONF_BROADLINK_MODE = "broadlink_mode"
 CONF_SSID = "ssid"
 CONF_PASSWORD = "password"
 

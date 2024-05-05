@@ -8,7 +8,7 @@ import socket
 from typing import Any
 import re
 
-from .pybroadlink import hello, gendevice, setup
+from .pybroadlink import hello, gendevice, setup, xdiscover
 from .pybroadlink.exceptions import (
     AuthenticationError,
     BroadlinkException,
@@ -26,9 +26,16 @@ from homeassistant.config_entries import (
 from homeassistant.const import CONF_HOST, CONF_MAC, CONF_NAME, CONF_TIMEOUT, CONF_TYPE
 from homeassistant.data_entry_flow import AbortFlow
 from homeassistant.helpers import config_validation as cv
-from homeassistant.helpers import selector
 
-from .const import CONF_SETUP, CONF_SSID, CONF_PASSWORD, DEFAULT_PORT, DEFAULT_TIMEOUT, DEVICE_TYPES, DOMAIN
+from .const import (
+    CONF_BROADLINK_MODE,
+    CONF_SSID,
+    CONF_PASSWORD,
+    DEFAULT_PORT,
+    DEFAULT_TIMEOUT,
+    DEVICE_TYPES,
+    DOMAIN
+)
 from .helpers import format_mac
 
 _LOGGER = logging.getLogger(__name__)
@@ -94,17 +101,36 @@ class BroadlinkFlowHandler(ConfigFlow, domain=DOMAIN):
 
     async def async_step_user(self, user_input=None):
         """Handle a flow initiated by the user."""
+        errors = {}  
+       
+        if user_input is not None:
+            broadlink_mode = user_input[CONF_BROADLINK_MODE]
+
+            if broadlink_mode == "Network":
+                return await self.async_step_network()
+            elif broadlink_mode == "Device":
+                return await self.async_step_device()
+           
+        data_schema = {
+            vol.Required(CONF_BROADLINK_MODE, default="Device"): vol.In(
+                {"Device": "Device Connect", "Network": "Network Setup"}
+            )
+        }
+        return self.async_show_form(
+            step_id="user",
+            data_schema=vol.Schema(data_schema),
+            errors=errors,
+        )
+
+    async def async_step_device(self, user_input=None):
+        """Connecting a broadlink device."""
         errors = {}
 
         if user_input is not None:
-            host = user_input.get(CONF_HOST)
+            host = user_input[CONF_HOST]
             timeout = user_input.get(CONF_TIMEOUT, DEFAULT_TIMEOUT)
-            broadlink_setup = user_input[CONF_SETUP]
 
-            try:
-                if broadlink_setup:
-                    return await self.async_step_broadlink_setup()
-            
+            try:            
                 partial_hello = partial(hello, host, timeout=timeout)
                 device = await self.hass.async_add_executor_job(partial_hello)
 
@@ -149,12 +175,11 @@ class BroadlinkFlowHandler(ConfigFlow, domain=DOMAIN):
                 return self.async_abort(reason=errors["base"])
 
         data_schema = {
-            vol.Optional(CONF_HOST): str,
+            vol.Required(CONF_HOST): str,
             vol.Optional(CONF_TIMEOUT, default=DEFAULT_TIMEOUT): cv.positive_int,
-            vol.Optional(CONF_SETUP): selector.BooleanSelector(selector.BooleanSelectorConfig()),
         }
         return self.async_show_form(
-            step_id="user",
+            step_id="device",
             data_schema=vol.Schema(data_schema),
             errors=errors,
         )
@@ -164,7 +189,7 @@ class BroadlinkFlowHandler(ConfigFlow, domain=DOMAIN):
         valid_password = re.match(r"^[\x20-\x7E]{8,63}$", password)
         return bool(valid_ssid) and bool(valid_password)
 
-    async def async_step_broadlink_setup(self, user_input=None):
+    async def async_step_network(self, user_input=None):
         """Connect to a local network to control the device."""
         errors = {}
 
@@ -175,20 +200,35 @@ class BroadlinkFlowHandler(ConfigFlow, domain=DOMAIN):
             if not self.is_valid_ssid_and_password(ssid, password):
                 errors["base"] = "invalid_ssid_or_password_format"
             else:
-                try:
-                    partial_setup = partial(setup, ssid, password, 3)
-                    is_ok = await self.hass.async_add_executor_job(partial_setup)
-                    _LOGGER.error("[Connect Network]: %s", is_ok)
+                partial_setup = partial(setup, ssid, password, 3)
+                await self.hass.async_add_executor_job(partial_setup)
+                
+                for device in xdiscover():
+                    if not device:
+                        errors["base"] = "cannot_connect"
+                        err_msg = "Device not found"
+                    else:
+                        device.timeout = DEFAULT_TIMEOUT
 
-                except Exception as e:
-                    _LOGGER.error("[Exception]: %s", e)
+                        if self.source != SOURCE_REAUTH:
+                            await self.async_set_device(device)
+                            self._abort_if_unique_id_configured(
+                                updates={CONF_HOST: device.host[0], CONF_TIMEOUT: DEFAULT_TIMEOUT}
+                            )
+                            return await self.async_step_auth()
+
+                        if device.mac == self.device.mac:
+                            await self.async_set_device(device, raise_on_progress=False)
+                            return await self.async_step_auth()
+                        
+                    _LOGGER.error("Failed to connect to the device at %s: %s", device.get("host", [None])[0], err_msg)
 
         data_schema = {
             vol.Required(CONF_SSID): str,
             vol.Required(CONF_PASSWORD): str,
         }
         return self.async_show_form(
-            step_id="broadlink_setup",
+            step_id="network",
             data_schema=vol.Schema(data_schema),
             errors=errors,
         )
