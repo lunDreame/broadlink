@@ -3,6 +3,12 @@
         "flow_title": "{name} ({model} at {host})",
         "step": {
             "user": {
+                "description": "브로드링크 구성 모드를 선택하세요.",
+                "data": {
+                    "broadlink_mode": "브로드링크 구성 모드:"
+                }
+            },
+            "device": {
                 "description": "장치에 연결하십시오.",
                 "data": {
                     "host": "호스트",
@@ -10,6 +16,14 @@
                 },
                 "data_description": {
                     "host": "브로드링크 장치의 호스트 이름 또는 IP 주소를 입력하세요."
+                }
+            },
+            "network": {
+                "title": "로컬 네트워크에 연결하여 장치 제어",
+                "description": "Broadlink 앱으로 장치를 이미 구성한 경우 이 단계는 필요하지 않습니다. 지침:\n1. 장치를 AP 모드로 전환합니다.\n2. 파란색 LED가 빠르게 깜박일 때까지 재설정 버튼을 길게 누릅니다.\n3. 파란색 LED가 천천히 깜박일 때까지 다시 길게 누릅니다.\n4. BroadlinkProv라는 WiFi SSID에 수동으로 연결합니다.",
+                "data": {
+                    "ssid": "SSID",
+                    "password": "패스워드"
                 }
             },
             "auth": {

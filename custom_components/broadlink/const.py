@@ -39,5 +39,9 @@ DOMAINS_AND_TYPES = {
 }
 DEVICE_TYPES = set.union(*DOMAINS_AND_TYPES.values())
 
+CONF_BROADLINK_MODE = "broadlink_mode"
+CONF_SSID = "ssid"
+CONF_PASSWORD = "password"
+
 DEFAULT_PORT = 80
 DEFAULT_TIMEOUT = 5

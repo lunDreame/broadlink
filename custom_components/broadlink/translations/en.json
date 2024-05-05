@@ -3,6 +3,12 @@
         "flow_title": "{name} ({model} at {host})",
         "step": {
             "user": {
+                "description": "Please select Broadlink Configuration Mode",
+                "data": {
+                    "broadlink_mode": "Broadlink configuration mode:"
+                }
+            },
+            "device": {
                 "description": "Connect to the device",
                 "data": {
                     "host": "Host",
@@ -10,6 +16,14 @@
                 },
                 "data_description": {
                     "host": "The hostname or IP address of your Broadlink device."
+                }
+            },
+            "network": {
+                "title": "Connect to a local network to control the device",
+                "description": "If you have already configured the device with the Broadlink app, this step is not necessary. Instructions:\n1. Put the device into AP Mode.\n2. Long press the reset button until the blue LED is blinking quickly.\n3. Long press again until blue LED is blinking slowly.\n4. Manually connect to the WiFi SSID named BroadlinkProv.",
+                "data": {
+                    "ssid": "SSID",
+                    "password": "Password"
                 }
             },
             "auth": {
@@ -42,6 +56,7 @@
             "unknown": "An unknown error occurred."
         },
         "error": {
+            "invalid_ssid_or_password_format": "Invalid SSID or Password format.",
             "cannot_connect": "Cannot connect to the device.",
             "invalid_host": "Invalid host.",
             "unknown": "An unknown error occurred."
