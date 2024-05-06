@@ -3,9 +3,9 @@
         "flow_title": "{name} ({model} at {host})",
         "step": {
             "user": {
-                "description": "Please select Broadlink Configuration Mode",
+                "description": "Broadlink Initial Configuration Mode Settings",
                 "data": {
-                    "broadlink_mode": "Broadlink configuration mode:"
+                    "broadlink_mode": "Broadlink mode:"
                 }
             },
             "device": {
