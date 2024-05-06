@@ -112,9 +112,9 @@ class BroadlinkFlowHandler(ConfigFlow, domain=DOMAIN):
                 return await self.async_step_device()
            
         data_schema = {
-            vol.Required(CONF_BROADLINK_MODE, default="Device"): vol.In(
-                {"Device": "Device Connect", "Network": "Network Setup"}
-            )
+            vol.Required(CONF_BROADLINK_MODE, default="Device"): vol.In({
+                "Device": "Device Connect Mode", "Network": "Network Setup Mode"
+            })
         }
         return self.async_show_form(
             step_id="user",
