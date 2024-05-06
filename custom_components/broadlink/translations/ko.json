@@ -3,9 +3,9 @@
         "flow_title": "{name} ({model} at {host})",
         "step": {
             "user": {
-                "description": "브로드링크 구성 모드를 선택하세요.",
+                "description": "Broadlink 초기 구성 모드 설정",
                 "data": {
-                    "broadlink_mode": "브로드링크 구성 모드:"
+                    "broadlink_mode": "Broadlink 모드:"
                 }
             },
             "device": {
@@ -15,7 +15,7 @@
                     "timeout": "타임아웃"
                 },
                 "data_description": {
-                    "host": "브로드링크 장치의 호스트 이름 또는 IP 주소를 입력하세요."
+                    "host": "Broadlink 장치의 호스트 이름 또는 IP 주소를 입력하세요."
                 }
             },
             "network": {
@@ -31,7 +31,7 @@
             },
             "reset": {
                 "title": "장치를 잠금 해제",
-                "description": "{name} ({model} at {host})는 잠겨 있습니다. 인증하고 설정을 완료하려면 장치를 잠금 해제해야 합니다. 지침:\n1. 브로드링크 앱을 엽니다.\n2. 장치를 선택합니다.\n3. 우측 상단의 `...`을 클릭합니다.\n4. 페이지 하단으로 스크롤합니다.\n5. 잠금을 해제합니다."
+                "description": "{name} ({model} at {host})는 잠겨 있습니다. 인증하고 설정을 완료하려면 장치를 잠금 해제해야 합니다. 지침:\n1. Broadlink 앱을 엽니다.\n2. 장치를 선택합니다.\n3. 우측 상단의 `...`을 클릭합니다.\n4. 페이지 하단으로 스크롤합니다.\n5. 잠금을 해제합니다."
             },
             "unlock": {
                 "title": "장치를 잠금 해제 (선택 사항)",
