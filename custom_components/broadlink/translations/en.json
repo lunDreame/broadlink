@@ -3,9 +3,10 @@
         "flow_title": "{name} ({model} at {host})",
         "step": {
             "user": {
-                "description": "Broadlink Initial Configuration Mode Settings",
-                "data": {
-                    "broadlink_mode": "Broadlink mode:"
+                "description": "If you're all set, select your device. If your device is not connected to Wi-Fi, select your network to complete the preparation.",
+                "menu_options": {
+                    "device": "Device Local Connection",
+                    "network": "Device network settings"
                 }
             },
             "device": {

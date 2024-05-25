@@ -101,26 +101,7 @@ class BroadlinkFlowHandler(ConfigFlow, domain=DOMAIN):
 
     async def async_step_user(self, user_input=None):
         """Handle a flow initiated by the user."""
-        errors = {}  
-       
-        if user_input is not None:
-            broadlink_mode = user_input[CONF_BROADLINK_MODE]
-
-            if broadlink_mode == "Network":
-                return await self.async_step_network()
-            elif broadlink_mode == "Device":
-                return await self.async_step_device()
-           
-        data_schema = {
-            vol.Required(CONF_BROADLINK_MODE, default="Device"): vol.In({
-                "Device": "Device Connect Mode", "Network": "Network Setup Mode"
-            })
-        }
-        return self.async_show_form(
-            step_id="user",
-            data_schema=vol.Schema(data_schema),
-            errors=errors,
-        )
+        return self.async_show_menu(step_id="user", menu_options=["device", "network"])
 
     async def async_step_device(self, user_input=None):
         """Connecting a broadlink device."""
