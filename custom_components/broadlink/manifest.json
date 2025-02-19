@@ -1,7 +1,7 @@
 {
   "domain": "broadlink",
   "name": "Broadlink",
-  "codeowners": ["@danielhiversen", "@felipediel", "@L-I-Am", "@eifinger"],
+  "codeowners": ["@lunDreame"],
   "config_flow": true,
   "dhcp": [
     {
@@ -35,8 +35,9 @@
       "macaddress": "780F77*"
     }
   ],
-  "documentation": "https://www.home-assistant.io/integrations/broadlink",
+  "documentation": "https://github.com/lunDreame/broadlink",
   "iot_class": "local_polling",
   "loggers": ["broadlink"],
-  "requirements": []
+  "requirements": [],
+  "version": "1.0.0"
 }
