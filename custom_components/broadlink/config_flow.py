@@ -6,17 +6,15 @@ from functools import partial
 import logging
 import socket
 from typing import Any
-import re
 
-from .pybroadlink import hello, gendevice, setup, xdiscover
-from .pybroadlink.exceptions import (
+import package as blk
+from package.exceptions import (
     AuthenticationError,
     BroadlinkException,
     NetworkTimeoutError,
 )
 import voluptuous as vol
 
-from homeassistant.components import dhcp
 from homeassistant.config_entries import (
     SOURCE_IMPORT,
     SOURCE_REAUTH,
@@ -26,16 +24,9 @@ from homeassistant.config_entries import (
 from homeassistant.const import CONF_HOST, CONF_MAC, CONF_NAME, CONF_TIMEOUT, CONF_TYPE
 from homeassistant.data_entry_flow import AbortFlow
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.service_info.dhcp import DhcpServiceInfo
 
-from .const import (
-    CONF_BROADLINK_MODE,
-    CONF_SSID,
-    CONF_PASSWORD,
-    DEFAULT_PORT,
-    DEFAULT_TIMEOUT,
-    DEVICE_TYPES,
-    DOMAIN
-)
+from .const import DEFAULT_PORT, DEFAULT_TIMEOUT, DEVICE_TYPES, DOMAIN
 from .helpers import format_mac
 
 _LOGGER = logging.getLogger(__name__)
@@ -46,11 +37,11 @@ class BroadlinkFlowHandler(ConfigFlow, domain=DOMAIN):
 
     VERSION = 1
 
-    def __init__(self) -> None:
-        """Initialize the Broadlink flow."""
-        self.device = None
+    device: blk.Device
 
-    async def async_set_device(self, device, raise_on_progress=True):
+    async def async_set_device(
+        self, device: blk.Device, raise_on_progress: bool = True
+    ) -> None:
         """Define a device for the config flow."""
         if device.type not in DEVICE_TYPES:
             _LOGGER.error(
@@ -74,7 +65,7 @@ class BroadlinkFlowHandler(ConfigFlow, domain=DOMAIN):
         }
 
     async def async_step_dhcp(
-        self, discovery_info: dhcp.DhcpServiceInfo
+        self, discovery_info: DhcpServiceInfo
     ) -> ConfigFlowResult:
         """Handle dhcp discovery."""
         host = discovery_info.ip
@@ -83,7 +74,7 @@ class BroadlinkFlowHandler(ConfigFlow, domain=DOMAIN):
         self._abort_if_unique_id_configured(updates={CONF_HOST: host})
 
         try:
-            device = await self.hass.async_add_executor_job(hello, host)
+            device = await self.hass.async_add_executor_job(blk.hello, host)
 
         except NetworkTimeoutError:
             return self.async_abort(reason="cannot_connect")
@@ -99,21 +90,19 @@ class BroadlinkFlowHandler(ConfigFlow, domain=DOMAIN):
         await self.async_set_device(device)
         return await self.async_step_auth()
 
-    async def async_step_user(self, user_input=None):
+    async def async_step_user(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
         """Handle a flow initiated by the user."""
-        return self.async_show_menu(step_id="user", menu_options=["device", "network"])
-
-    async def async_step_device(self, user_input=None):
-        """Connecting a broadlink device."""
         errors = {}
 
         if user_input is not None:
             host = user_input[CONF_HOST]
             timeout = user_input.get(CONF_TIMEOUT, DEFAULT_TIMEOUT)
 
-            try:            
-                partial_hello = partial(hello, host, timeout=timeout)
-                device = await self.hass.async_add_executor_job(partial_hello)
+            try:
+                hello = partial(blk.hello, host, timeout=timeout)
+                device = await self.hass.async_add_executor_job(hello)
 
             except NetworkTimeoutError:
                 errors["base"] = "cannot_connect"
@@ -160,64 +149,15 @@ class BroadlinkFlowHandler(ConfigFlow, domain=DOMAIN):
             vol.Optional(CONF_TIMEOUT, default=DEFAULT_TIMEOUT): cv.positive_int,
         }
         return self.async_show_form(
-            step_id="device",
-            data_schema=vol.Schema(data_schema),
-            errors=errors,
-        )
-    
-    def is_valid_ssid_and_password(self, ssid, password):
-        valid_ssid = re.match(r"^[\x20-\x7E]{0,32}$", ssid)
-        valid_password = re.match(r"^[\x20-\x7E]{8,63}$", password)
-        return bool(valid_ssid) and bool(valid_password)
-
-    async def async_step_network(self, user_input=None):
-        """Connect to a local network to control the device."""
-        errors = {}
-
-        if user_input is not None:
-            ssid = user_input[CONF_SSID]
-            password = user_input[CONF_PASSWORD]
-            
-            if not self.is_valid_ssid_and_password(ssid, password):
-                errors["base"] = "invalid_ssid_or_password_format"
-            else:
-                partial_setup = partial(setup, ssid, password, 3)
-                await self.hass.async_add_executor_job(partial_setup)
-                
-                for device in xdiscover():
-                    if not device:
-                        errors["base"] = "cannot_connect"
-                        err_msg = "Device not found"
-                    else:
-                        device.timeout = DEFAULT_TIMEOUT
-
-                        if self.source != SOURCE_REAUTH:
-                            await self.async_set_device(device)
-                            self._abort_if_unique_id_configured(
-                                updates={CONF_HOST: device.host[0], CONF_TIMEOUT: DEFAULT_TIMEOUT}
-                            )
-                            return await self.async_step_auth()
-
-                        if device.mac == self.device.mac:
-                            await self.async_set_device(device, raise_on_progress=False)
-                            return await self.async_step_auth()
-                        
-                    _LOGGER.error("Failed to connect to the device at %s: %s", device.get("host", [None])[0], err_msg)
-
-        data_schema = {
-            vol.Required(CONF_SSID): str,
-            vol.Required(CONF_PASSWORD): str,
-        }
-        return self.async_show_form(
-            step_id="network",
+            step_id="user",
             data_schema=vol.Schema(data_schema),
             errors=errors,
         )
 
-    async def async_step_auth(self):
+    async def async_step_auth(self) -> ConfigFlowResult:
         """Authenticate to the device."""
         device = self.device
-        errors = {}
+        errors: dict[str, str] = {}
 
         try:
             await self.hass.async_add_executor_job(device.auth)
@@ -267,7 +207,11 @@ class BroadlinkFlowHandler(ConfigFlow, domain=DOMAIN):
         )
         return self.async_show_form(step_id="auth", errors=errors)
 
-    async def async_step_reset(self, user_input=None, errors=None):
+    async def async_step_reset(
+        self,
+        user_input: dict[str, Any] | None = None,
+        errors: dict[str, str] | None = None,
+    ) -> ConfigFlowResult:
         """Guide the user to unlock the device manually.
 
         We are unable to authenticate because the device is locked.
@@ -290,7 +234,9 @@ class BroadlinkFlowHandler(ConfigFlow, domain=DOMAIN):
             {CONF_HOST: device.host[0], CONF_TIMEOUT: device.timeout}
         )
 
-    async def async_step_unlock(self, user_input=None):
+    async def async_step_unlock(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
         """Unlock the device.
 
         The authentication succeeded, but the device is locked.
@@ -344,10 +290,12 @@ class BroadlinkFlowHandler(ConfigFlow, domain=DOMAIN):
             },
         )
 
-    async def async_step_finish(self, user_input=None):
+    async def async_step_finish(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
         """Choose a name for the device and create config entry."""
         device = self.device
-        errors = {}
+        errors: dict[str, str] = {}
 
         # Abort reauthentication flow.
         self._abort_if_unique_id_configured(
@@ -370,16 +318,16 @@ class BroadlinkFlowHandler(ConfigFlow, domain=DOMAIN):
             step_id="finish", data_schema=vol.Schema(data_schema), errors=errors
         )
 
-    async def async_step_import(self, import_info):
+    async def async_step_import(self, import_data: dict[str, Any]) -> ConfigFlowResult:
         """Import a device."""
-        self._async_abort_entries_match({CONF_HOST: import_info[CONF_HOST]})
-        return await self.async_step_user(import_info)
+        self._async_abort_entries_match({CONF_HOST: import_data[CONF_HOST]})
+        return await self.async_step_user(import_data)
 
     async def async_step_reauth(
         self, entry_data: Mapping[str, Any]
     ) -> ConfigFlowResult:
         """Reauthenticate to the device."""
-        device = gendevice(
+        device = blk.gendevice(
             entry_data[CONF_TYPE],
             (entry_data[CONF_HOST], DEFAULT_PORT),
             bytes.fromhex(entry_data[CONF_MAC]),

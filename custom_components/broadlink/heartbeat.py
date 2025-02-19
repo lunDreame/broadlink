@@ -3,7 +3,7 @@
 import datetime as dt
 import logging
 
-from .pybroadlink import ping
+import package as blk
 
 from homeassistant.const import CONF_HOST
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant
@@ -54,7 +54,7 @@ class BroadlinkHeartbeat:
         """Send packets to feed watchdog timers."""
         for host in hosts:
             try:
-                ping(host)
+                blk.ping(host)
             except OSError as err:
                 _LOGGER.debug("Failed to send heartbeat to %s: %s", host, err)
             else:

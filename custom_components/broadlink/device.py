@@ -4,8 +4,8 @@ from contextlib import suppress
 from functools import partial
 import logging
 
-from .pybroadlink import Device, gendevice
-from .pybroadlink.exceptions import (
+import package as blk
+from package.exceptions import (
     AuthenticationError,
     AuthorizationError,
     BroadlinkException,
@@ -13,7 +13,7 @@ from .pybroadlink.exceptions import (
     NetworkTimeoutError,
 )
 
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntry
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_HOST,
     CONF_MAC,
@@ -27,7 +27,7 @@ from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers import device_registry as dr
 
 from .const import DEFAULT_PORT, DOMAIN, DOMAINS_AND_TYPES
-from .updater import get_update_manager
+from .updater import BroadlinkUpdateManager, get_update_manager
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -37,16 +37,16 @@ def get_domains(device_type: str) -> set[Platform]:
     return {d for d, t in DOMAINS_AND_TYPES.items() if device_type in t}
 
 
-class BroadlinkDevice:
+class BroadlinkDevice[_ApiT: blk.Device = blk.Device]:
     """Manages a Broadlink device."""
 
-    api: Device
+    api: _ApiT
 
     def __init__(self, hass: HomeAssistant, config: ConfigEntry) -> None:
         """Initialize the device."""
         self.hass = hass
         self.config = config
-        self.update_manager = None
+        self.update_manager: BroadlinkUpdateManager[_ApiT] | None = None
         self.fw_version: int | None = None
         self.authorized: bool | None = None
         self.reset_jobs: list[CALLBACK_TYPE] = []
@@ -99,7 +99,7 @@ class BroadlinkDevice:
         """Set up the device and related entities."""
         config = self.config
 
-        api = gendevice(
+        api = blk.gendevice(
             config.data[CONF_TYPE],
             (config.data[CONF_HOST], DEFAULT_PORT),
             bytes.fromhex(config.data[CONF_MAC]),
@@ -196,10 +196,4 @@ class BroadlinkDevice:
             self.api.host[0],
         )
 
-        self.hass.async_create_task(
-            self.hass.config_entries.flow.async_init(
-                DOMAIN,
-                context={"source": SOURCE_REAUTH},
-                data={CONF_NAME: self.name, **self.config.data},
-            )
-        )
+        self.config.async_start_reauth(self.hass, data={CONF_NAME: self.name})

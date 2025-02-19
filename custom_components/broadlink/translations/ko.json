@@ -1,81 +1,81 @@
 {
     "config": {
-        "flow_title": "{name} ({model} at {host})",
-        "step": {
-            "user": {
-                "description": "모든 준비가 완료됐다면 디바이스를 선택하세요. 기기가 와이파이에 연결되어 있지 않았다면 네크워크를 선택하여 준비를 완료하세요.",
-                "menu_options": {
-                    "device": "디바이스 로컬 연결",
-                    "network": "디바이스 네크워크 설정"
-                }
-            },
-            "device": {
-                "description": "장치에 연결하십시오.",
-                "data": {
-                    "host": "호스트",
-                    "timeout": "타임아웃"
-                },
-                "data_description": {
-                    "host": "Broadlink 장치의 호스트 이름 또는 IP 주소를 입력하세요."
-                }
-            },
-            "network": {
-                "title": "로컬 네트워크에 연결하여 장치 제어",
-                "description": "Broadlink 앱으로 장치를 이미 구성한 경우 이 단계는 필요하지 않습니다. 지침:\n1. 장치를 AP 모드로 전환합니다.\n2. 파란색 LED가 빠르게 깜박일 때까지 재설정 버튼을 길게 누릅니다.\n3. 파란색 LED가 천천히 깜박일 때까지 다시 길게 누릅니다.\n4. BroadlinkProv라는 WiFi SSID에 수동으로 연결합니다.",
-                "data": {
-                    "ssid": "SSID",
-                    "password": "패스워드"
-                }
-            },
-            "auth": {
-                "title": "장치에 인증"
-            },
-            "reset": {
-                "title": "장치를 잠금 해제",
-                "description": "{name} ({model} at {host})는 잠겨 있습니다. 인증하고 설정을 완료하려면 장치를 잠금 해제해야 합니다. 지침:\n1. Broadlink 앱을 엽니다.\n2. 장치를 선택합니다.\n3. 우측 상단의 `...`을 클릭합니다.\n4. 페이지 하단으로 스크롤합니다.\n5. 잠금을 해제합니다."
-            },
-            "unlock": {
-                "title": "장치를 잠금 해제 (선택 사항)",
-                "description": "{name} ({model} at {host})는 잠겨 있습니다. 이는 Home Assistant에서 인증 문제를 일으킬 수 있습니다. 잠금을 해제하시겠습니까?",
-                "data": {
-                    "unlock": "예, 해제하세요."
-                }
-            },
-            "finish": {
-                "title": "장치의 이름을 선택하십시오.",
-                "data": {
-                    "name": "장치 이름"
-                }
-            }
+      "flow_title": "{name} ({model} at {host})",
+      "step": {
+        "user": {
+          "description": "장치에 연결",
+          "data": {
+            "host": "[%key:common::config_flow::data::host%]",
+            "timeout": "타임아웃"
+          },
+          "data_description": {
+            "host": "Broadlink 장치의 호스트 이름 또는 IP 주소입니다."
+          }
         },
-        "abort": {
-            "already_configured": "이 장치는 이미 설정되었습니다.",
-            "already_in_progress": "설정이 이미 진행 중입니다.",
-            "cannot_connect": "장치에 연결할 수 없습니다.",
-            "invalid_host": "유효하지 않은 호스트입니다.",
-            "not_supported": "이 장치는 지원되지 않습니다.",
-            "unknown": "알 수 없는 오류가 발생했습니다."
+        "auth": {
+          "title": "장치 인증"
         },
-        "error": {
-            "cannot_connect": "장치에 연결할 수 없습니다.",
-            "invalid_host": "유효하지 않은 호스트입니다.",
-            "unknown": "알 수 없는 오류가 발생했습니다."
+        "reset": {
+          "title": "장치 잠금 해제",
+          "description": "{name} ({model} at {host})가 잠겨 있습니다. 인증을 완료하려면 장치의 잠금을 해제해야 합니다. 방법:\n1. Broadlink 앱을 엽니다.\n2. 장치를 선택합니다.\n3. 오른쪽 상단의 `...`을 선택합니다.\n4. 페이지 하단으로 스크롤합니다.\n5. 잠금을 비활성화합니다."
+        },
+        "unlock": {
+          "title": "장치 잠금 해제 (선택 사항)",
+          "description": "{name} ({model} at {host})가 잠겨 있습니다. 이는 Home Assistant에서 인증 문제를 일으킬 수 있습니다. 잠금을 해제하시겠습니까?",
+          "data": {
+            "unlock": "예, 해제합니다."
+          }
+        },
+        "finish": {
+          "title": "장치 이름 선택",
+          "data": {
+            "name": "[%key:common::config_flow::data::name%]"
+          }
         }
+      },
+      "abort": {
+        "already_configured": "[%key:common::config_flow::abort::already_configured_device%]",
+        "already_in_progress": "[%key:common::config_flow::abort::already_in_progress%]",
+        "cannot_connect": "연결할 수 없음",
+        "invalid_host": "잘못된 호스트",
+        "not_supported": "지원되지 않는 장치",
+        "unknown": "알 수 없는 오류"
+      },
+      "error": {
+        "cannot_connect": "연결할 수 없음",
+        "invalid_auth": "잘못된 인증 정보",
+        "invalid_host": "잘못된 호스트",
+        "unknown": "알 수 없는 오류"
+      }
     },
     "entity": {
-        "sensor": {
-            "light": {
-                "name": "조도"
-            },
-            "noise": {
-                "name": "소음"
-            },
-            "overload": {
-                "name": "과부하"
-            },
-            "total_consumption": {
-                "name": "총 소비량"
-            }
+      "sensor": {
+        "light": {
+          "name": "조도"
+        },
+        "noise": {
+          "name": "소음"
+        },
+        "overload": {
+          "name": "과부하"
+        },
+        "total_consumption": {
+          "name": "총 소비량"
         }
+      },
+      "select": {
+        "day_of_week": {
+          "name": "요일",
+          "state": {
+            "monday": "월요일",
+            "tuesday": "화요일",
+            "wednesday": "수요일",
+            "thursday": "목요일",
+            "friday": "금요일",
+            "saturday": "토요일",
+            "sunday": "일요일"
+          }
+        }
+      }
     }
-}
+  }

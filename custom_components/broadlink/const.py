@@ -6,7 +6,9 @@ DOMAIN = "broadlink"
 
 DOMAINS_AND_TYPES = {
     Platform.CLIMATE: {"HYS"},
+    Platform.LIGHT: {"LB1", "LB2"},
     Platform.REMOTE: {"RM4MINI", "RM4PRO", "RMMINI", "RMMINIB", "RMPRO"},
+    Platform.SELECT: {"HYS"},
     Platform.SENSOR: {
         "A1",
         "MP1S",
@@ -35,13 +37,9 @@ DOMAINS_AND_TYPES = {
         "SP4",
         "SP4B",
     },
-    Platform.LIGHT: {"LB1", "LB2"},
+    Platform.TIME: {"HYS"},
 }
 DEVICE_TYPES = set.union(*DOMAINS_AND_TYPES.values())
-
-CONF_BROADLINK_MODE = "broadlink_mode"
-CONF_SSID = "ssid"
-CONF_PASSWORD = "password"
 
 DEFAULT_PORT = 80
 DEFAULT_TIMEOUT = 5
