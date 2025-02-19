@@ -1,81 +1,81 @@
 {
-    "config": {
-      "flow_title": "{name} ({model} at {host})",
-      "step": {
-        "user": {
-          "description": "장치에 연결",
-          "data": {
-            "host": "[%key:common::config_flow::data::host%]",
-            "timeout": "타임아웃"
-          },
-          "data_description": {
-            "host": "Broadlink 장치의 호스트 이름 또는 IP 주소입니다."
-          }
+  "config": {
+    "flow_title": "{name} ({model} at {host})",
+    "step": {
+      "user": {
+        "description": "장치에 연결",
+        "data": {
+          "host": "호스트",
+          "timeout": "타임아웃"
         },
-        "auth": {
-          "title": "장치 인증"
-        },
-        "reset": {
-          "title": "장치 잠금 해제",
-          "description": "{name} ({model} at {host})가 잠겨 있습니다. 인증을 완료하려면 장치의 잠금을 해제해야 합니다. 방법:\n1. Broadlink 앱을 엽니다.\n2. 장치를 선택합니다.\n3. 오른쪽 상단의 `...`을 선택합니다.\n4. 페이지 하단으로 스크롤합니다.\n5. 잠금을 비활성화합니다."
-        },
-        "unlock": {
-          "title": "장치 잠금 해제 (선택 사항)",
-          "description": "{name} ({model} at {host})가 잠겨 있습니다. 이는 Home Assistant에서 인증 문제를 일으킬 수 있습니다. 잠금을 해제하시겠습니까?",
-          "data": {
-            "unlock": "예, 해제합니다."
-          }
-        },
-        "finish": {
-          "title": "장치 이름 선택",
-          "data": {
-            "name": "[%key:common::config_flow::data::name%]"
-          }
+        "data_description": {
+          "host": "Broadlink 장치의 호스트 이름 또는 IP 주소입니다."
         }
       },
-      "abort": {
-        "already_configured": "[%key:common::config_flow::abort::already_configured_device%]",
-        "already_in_progress": "[%key:common::config_flow::abort::already_in_progress%]",
-        "cannot_connect": "연결할 수 없음",
-        "invalid_host": "잘못된 호스트",
-        "not_supported": "지원되지 않는 장치",
-        "unknown": "알 수 없는 오류"
+      "auth": {
+        "title": "장치 인증"
       },
-      "error": {
-        "cannot_connect": "연결할 수 없음",
-        "invalid_auth": "잘못된 인증 정보",
-        "invalid_host": "잘못된 호스트",
-        "unknown": "알 수 없는 오류"
+      "reset": {
+        "title": "장치 잠금 해제",
+        "description": "{name} ({model} at {host})가 잠겨 있습니다. 인증을 완료하려면 장치의 잠금을 해제해야 합니다. 방법:\n1. Broadlink 앱을 엽니다.\n2. 장치를 선택합니다.\n3. 오른쪽 상단의 `...`을 선택합니다.\n4. 페이지 하단으로 스크롤합니다.\n5. 잠금을 비활성화합니다."
+      },
+      "unlock": {
+        "title": "장치 잠금 해제 (선택 사항)",
+        "description": "{name} ({model} at {host})가 잠겨 있습니다. 이는 Home Assistant에서 인증 문제를 일으킬 수 있습니다. 잠금을 해제하시겠습니까?",
+        "data": {
+          "unlock": "예, 해제합니다."
+        }
+      },
+      "finish": {
+        "title": "장치 이름 선택",
+        "data": {
+          "name": "장치 이름"
+        }
       }
     },
-    "entity": {
-      "sensor": {
-        "light": {
-          "name": "조도"
-        },
-        "noise": {
-          "name": "소음"
-        },
-        "overload": {
-          "name": "과부하"
-        },
-        "total_consumption": {
-          "name": "총 소비량"
-        }
+    "abort": {
+      "already_configured": "이 장치는 이미 구성되었습니다.",
+      "already_in_progress": "이 장치의 설정이 이미 진행 중입니다.",
+      "cannot_connect": "장치에 연결할 수 없습니다.",
+      "invalid_host": "잘못된 호스트입니다.",
+      "not_supported": "지원되지 않는 장치입니다.",
+      "unknown": "알 수 없는 오류입니다."
+    },
+    "error": {
+      "cannot_connect": "장치에 연결할 수 없습니다.",
+      "invalid_auth": "잘못된 인증 정보입니다.",
+      "invalid_host": "잘못된 호스트입니다.",
+      "unknown": "알 수 없는 오류입니다."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "light": {
+        "name": "조도"
       },
-      "select": {
-        "day_of_week": {
-          "name": "요일",
-          "state": {
-            "monday": "월요일",
-            "tuesday": "화요일",
-            "wednesday": "수요일",
-            "thursday": "목요일",
-            "friday": "금요일",
-            "saturday": "토요일",
-            "sunday": "일요일"
-          }
+      "noise": {
+        "name": "소음"
+      },
+      "overload": {
+        "name": "과부하"
+      },
+      "total_consumption": {
+        "name": "총 소비량"
+      }
+    },
+    "select": {
+      "day_of_week": {
+        "name": "요일",
+        "state": {
+          "monday": "월요일",
+          "tuesday": "화요일",
+          "wednesday": "수요일",
+          "thursday": "목요일",
+          "friday": "금요일",
+          "saturday": "토요일",
+          "sunday": "일요일"
         }
       }
     }
   }
+}

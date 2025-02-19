@@ -7,8 +7,8 @@ import logging
 import socket
 from typing import Any
 
-import package as blk
-from package.exceptions import (
+from . import package as blk
+from .package.exceptions import (
     AuthenticationError,
     BroadlinkException,
     NetworkTimeoutError,

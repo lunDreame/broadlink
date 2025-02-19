@@ -7,8 +7,8 @@ from datetime import datetime, timedelta
 import logging
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
-import package as blk
-from package.exceptions import AuthorizationError, BroadlinkException
+from . import package as blk
+from .package.exceptions import AuthorizationError, BroadlinkException
 
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util import dt as dt_util

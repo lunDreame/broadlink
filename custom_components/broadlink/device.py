@@ -4,8 +4,8 @@ from contextlib import suppress
 from functools import partial
 import logging
 
-import package as blk
-from package.exceptions import (
+from . import package as blk
+from .package.exceptions import (
     AuthenticationError,
     AuthorizationError,
     BroadlinkException,

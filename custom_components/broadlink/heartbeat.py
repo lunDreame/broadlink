@@ -3,7 +3,7 @@
 import datetime as dt
 import logging
 
-import package as blk
+from . import package as blk
 
 from homeassistant.const import CONF_HOST
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant
